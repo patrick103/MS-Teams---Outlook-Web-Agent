@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js Template",
-  description: "A minimal Next.js starter template",
+  title: "MS Teams & Outlook AI Agent",
+  description: "AI-powered assistant for Microsoft Teams and Outlook",
 };
 
 export default function RootLayout({
