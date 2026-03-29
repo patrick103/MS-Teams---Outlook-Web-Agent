@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { z } from "zod";
+import { getToken } from "@/lib/auth-helpers";
 import { getTeamsChats, getChatMessages, sendTeamsMessage, getTeams, getTeamChannels, getChannelMessages } from "@/lib/graph";
 
-async function getToken(request: NextRequest) {
-  const sessionId = request.cookies.get("session_id")?.value;
-  if (!sessionId) return null;
-  const session = await getSession(sessionId);
-  return session?.accessToken ?? null;
-}
+const sendMessageSchema = z.object({
+  chatId: z.string().min(1, "chatId is required"),
+  message: z.string().min(1, "message is required"),
+});
 
 export async function GET(request: NextRequest) {
   const token = await getToken(request);
@@ -62,15 +61,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  let body: z.infer<typeof sendMessageSchema>;
   try {
-    const body = await request.json();
-    const { chatId, message } = body;
-
-    if (!chatId || !message) {
-      return NextResponse.json({ error: "chatId and message required" }, { status: 400 });
+    const raw = await request.json();
+    const parsed = sendMessageSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid request", details: parsed.error.flatten() },
+        { status: 400 }
+      );
     }
+    body = parsed.data;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
 
-    await sendTeamsMessage(token, chatId, message);
+  try {
+    await sendTeamsMessage(token, body.chatId, body.message);
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(

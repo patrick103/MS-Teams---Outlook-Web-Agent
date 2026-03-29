@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { getToken } from "@/lib/auth-helpers";
 import { getEmails, sendEmail, replyToEmail } from "@/lib/graph";
-
-async function getToken(request: NextRequest) {
-  const sessionId = request.cookies.get("session_id")?.value;
-  if (!sessionId) return null;
-  const session = await getSession(sessionId);
-  return session?.accessToken ?? null;
-}
 
 export async function GET(request: NextRequest) {
   const token = await getToken(request);

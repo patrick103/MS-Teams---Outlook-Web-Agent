@@ -3,10 +3,11 @@ import { db } from "@/db";
 import { agentLogs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { desc } from "drizzle-orm";
+import { getVerifiedSession } from "@/lib/auth-helpers";
 
 export async function GET(request: NextRequest) {
-  const userId = request.cookies.get("user_id")?.value;
-  if (!userId) {
+  const session = await getVerifiedSession(request);
+  if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -16,7 +17,7 @@ export async function GET(request: NextRequest) {
   const logs = await db
     .select()
     .from(agentLogs)
-    .where(eq(agentLogs.userId, userId))
+    .where(eq(agentLogs.userId, session.userId))
     .orderBy(desc(agentLogs.createdAt))
     .limit(limit);
 

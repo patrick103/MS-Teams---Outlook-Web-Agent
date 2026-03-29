@@ -21,6 +21,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+  const [apiKeyModified, setApiKeyModified] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -45,13 +46,25 @@ export default function SettingsPage() {
     setSaving(true);
     setMessage("");
     try {
+      const payload: Record<string, unknown> = {
+        openrouterModel: settings.openrouterModel,
+        agentAutoReply: settings.agentAutoReply,
+        agentAutoSummary: settings.agentAutoSummary,
+        agentTone: settings.agentTone,
+      };
+      // Only send API key if the user actually modified it
+      if (apiKeyModified && settings.openrouterApiKey) {
+        payload.openrouterApiKey = settings.openrouterApiKey;
+      }
+
       const res = await fetch("/api/settings", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(settings),
+        body: JSON.stringify(payload),
       });
       if (res.ok) {
         setMessage("Settings saved successfully");
+        setApiKeyModified(false);
         loadSettings();
       } else {
         setMessage("Failed to save settings");
@@ -109,7 +122,7 @@ export default function SettingsPage() {
             type="password"
             placeholder="sk-or-..."
             value={settings.openrouterApiKey}
-            onChange={(e) => setSettings({ ...settings, openrouterApiKey: e.target.value })}
+            onChange={(e) => { setSettings({ ...settings, openrouterApiKey: e.target.value }); setApiKeyModified(true); }}
             className="input-field"
           />
           <p className="text-xs text-[var(--text-secondary)] mt-1">

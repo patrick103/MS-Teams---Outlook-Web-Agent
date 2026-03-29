@@ -208,7 +208,7 @@ export default function TeamsPage() {
                     <p className="text-xs font-medium text-indigo-400 mb-1">
                       {msg.from?.user?.displayName ?? "Unknown"}
                     </p>
-                    <p className="text-sm" dangerouslySetInnerHTML={{ __html: msg.body?.content?.replace(/<[^>]*>/g, "") ?? "" }} />
+                    <p className="text-sm">{msg.body?.content?.replace(/<[^>]*>/g, "") ?? ""}</p>
                     <p className="text-xs text-[var(--text-secondary)] mt-1">
                       {new Date(msg.createdDateTime).toLocaleTimeString()}
                     </p>

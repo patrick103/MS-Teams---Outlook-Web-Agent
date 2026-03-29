@@ -1,13 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getSession } from "@/lib/auth";
+import { z } from "zod";
+import { getToken } from "@/lib/auth-helpers";
 import { getCalendarEvents, createCalendarEvent } from "@/lib/graph";
 
-async function getToken(request: NextRequest) {
-  const sessionId = request.cookies.get("session_id")?.value;
-  if (!sessionId) return null;
-  const session = await getSession(sessionId);
-  return session?.accessToken ?? null;
-}
+const createEventSchema = z.object({
+  subject: z.string().min(1, "subject is required"),
+  start: z.string().min(1, "start date/time is required"),
+  end: z.string().min(1, "end date/time is required"),
+  body: z.string().optional(),
+  location: z.string().optional(),
+  attendees: z.array(z.string().email()).optional(),
+});
 
 export async function GET(request: NextRequest) {
   const token = await getToken(request);
@@ -35,8 +38,22 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  let body: z.infer<typeof createEventSchema>;
   try {
-    const body = await request.json();
+    const raw = await request.json();
+    const parsed = createEventSchema.safeParse(raw);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Invalid request", details: parsed.error.flatten() },
+        { status: 400 }
+      );
+    }
+    body = parsed.data;
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+  }
+
+  try {
     const event = await createCalendarEvent(token, body);
     return NextResponse.json({ event });
   } catch (error) {
