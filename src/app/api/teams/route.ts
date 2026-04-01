@@ -48,6 +48,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   } catch (error) {
+    console.error("Failed to fetch Teams data:", error);
     return NextResponse.json(
       { error: "Failed to fetch Teams data" },
       { status: 500 }
@@ -80,6 +81,7 @@ export async function POST(request: NextRequest) {
     await sendTeamsMessage(token, body.chatId, body.message);
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("Failed to send message:", error);
     return NextResponse.json(
       { error: "Failed to send message" },
       { status: 500 }

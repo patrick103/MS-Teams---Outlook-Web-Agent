@@ -10,24 +10,12 @@ const envSchema = z.object({
   TOKEN_ENCRYPTION_KEY: z.string().min(32).optional(),
 });
 
-function loadEnv() {
-  const parsed = envSchema.safeParse(process.env);
-  if (!parsed.success) {
-    console.warn("Missing environment variables:", parsed.error.flatten().fieldErrors);
-    return {
-      AZURE_CLIENT_ID: process.env.AZURE_CLIENT_ID ?? "",
-      AZURE_CLIENT_SECRET: process.env.AZURE_CLIENT_SECRET ?? "",
-      AZURE_TENANT_ID: process.env.AZURE_TENANT_ID ?? "",
-      AZURE_REDIRECT_URI: process.env.AZURE_REDIRECT_URI ?? "http://localhost:3000/api/auth/callback",
-      NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
-      OPENROUTER_API_KEY: process.env.OPENROUTER_API_KEY,
-      TOKEN_ENCRYPTION_KEY: process.env.TOKEN_ENCRYPTION_KEY,
-    };
-  }
-  return parsed.data;
+const parsed = envSchema.safeParse(process.env);
+if (!parsed.success) {
+  throw new Error(`Invalid environment variables: ${JSON.stringify(parsed.error.flatten().fieldErrors, null, 2)}`);
 }
 
-export const env = loadEnv();
+export const env = parsed.data;
 
 export const MS_GRAPH_SCOPES = [
   "User.Read",

@@ -6,15 +6,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleLogin = async () => {
+  const handleLogin = () => {
     setLoading(true);
-    setError("");
-    try {
-      window.location.href = "/api/auth";
-    } catch {
-      setError("Failed to start authentication");
-      setLoading(false);
-    }
+    window.location.href = "/api/auth";
   };
 
   return (

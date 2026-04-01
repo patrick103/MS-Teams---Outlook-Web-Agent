@@ -1,5 +1,7 @@
 import { Client } from "@microsoft/microsoft-graph-client";
 
+const VALID_FOLDERS = ["inbox", "sentitems", "drafts", "deleteditems", "junkemail", "archive", "outbox"] as const;
+
 export function createGraphClient(accessToken: string) {
   return Client.init({
     authProvider: (done) => {
@@ -10,6 +12,9 @@ export function createGraphClient(accessToken: string) {
 
 // --- EMAIL ---
 export async function getEmails(accessToken: string, top = 25, folder = "inbox") {
+  if (!VALID_FOLDERS.includes(folder as (typeof VALID_FOLDERS)[number])) {
+    throw new Error(`Invalid folder: ${folder}. Must be one of: ${VALID_FOLDERS.join(", ")}`);
+  }
   const client = createGraphClient(accessToken);
   const response = await client
     .api(`/me/mailFolders/${folder}/messages`)
@@ -47,8 +52,9 @@ export async function replyToEmail(
 ) {
   const client = createGraphClient(accessToken);
   await client.api(`/me/messages/${messageId}/reply`).post({
-    comment: body,
-    contentType,
+    message: {
+      body: { contentType, content: body },
+    },
   });
 }
 

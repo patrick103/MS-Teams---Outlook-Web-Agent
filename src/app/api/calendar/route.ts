@@ -25,6 +25,7 @@ export async function GET(request: NextRequest) {
     const events = await getCalendarEvents(token, top);
     return NextResponse.json({ events });
   } catch (error) {
+    console.error("Failed to fetch calendar events:", error);
     return NextResponse.json(
       { error: "Failed to fetch calendar events" },
       { status: 500 }
@@ -57,6 +58,7 @@ export async function POST(request: NextRequest) {
     const event = await createCalendarEvent(token, body);
     return NextResponse.json({ event });
   } catch (error) {
+    console.error("Failed to create event:", error);
     return NextResponse.json(
       { error: "Failed to create event" },
       { status: 500 }

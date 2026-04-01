@@ -1,6 +1,6 @@
 import { env } from "@/lib/config";
 import { db } from "@/db";
-import { settings, agentLogs } from "@/db/schema";
+import { notes, settings, agentLogs } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 interface OpenRouterMessage {
@@ -192,9 +192,12 @@ export async function extractNotes(userId: string, content: string, source: stri
   const notesResult = await callOpenRouter(config.apiKey, config.model, messages);
   await logAction(userId, "extract_notes", source, content.slice(0, 500), notesResult);
 
-  await db.insert(settings).values({
+  await db.insert(notes).values({
     userId,
-  }).onConflictDoNothing();
+    title: "Extracted Notes",
+    content: notesResult,
+    source,
+  });
 
   return notesResult;
 }

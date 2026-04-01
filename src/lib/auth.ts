@@ -10,7 +10,7 @@ import { db } from "@/db";
 import { sessions, settings } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { v4 as uuidv4 } from "uuid";
-import { randomBytes, createCipheriv, createDecipheriv } from "crypto";
+import { randomBytes, createCipheriv, createDecipheriv, createHash } from "crypto";
 
 const msalConfig = {
   auth: {
@@ -45,9 +45,6 @@ function getEncryptionKey(): Buffer {
   // Derive a fixed-length key from the config value using SHA-256
   return createHash("sha256").update(key).digest();
 }
-
-// Lazy import to avoid circular — we just need createHash
-import { createHash } from "crypto";
 
 /**
  * Encrypt a plaintext token string.
