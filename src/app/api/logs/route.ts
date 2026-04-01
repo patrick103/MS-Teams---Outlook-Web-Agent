@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { agentLogs } from "@/db/schema";
-import { eq } from "drizzle-orm";
-import { desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import { getVerifiedSession } from "@/lib/auth-helpers";
 
 export async function GET(request: NextRequest) {
