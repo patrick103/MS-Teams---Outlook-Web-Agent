@@ -42,3 +42,49 @@ export const notes = sqliteTable("notes", {
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
   updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
 });
+
+export const graphSubscriptions = sqliteTable("graph_subscriptions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull(),
+  resource: text("resource").notNull(),
+  subscriptionId: text("subscription_id").notNull(),
+  expirationDateTime: integer("expiration_date_time", { mode: "timestamp" }).notNull(),
+  changeType: text("change_type").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+}, (table) => ({
+  userIdIdx: index("graph_subscriptions_user_id_idx").on(table.userId),
+}));
+
+export const messageQueue = sqliteTable("message_queue", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").notNull(),
+  source: text("source", { enum: ["email", "teams"] }).notNull(),
+  resourceId: text("resource_id").notNull(),
+  chatId: text("chat_id"),
+  subject: text("subject"),
+  fromAddress: text("from_address").notNull(),
+  body: text("body").notNull(),
+  status: text("status", { enum: ["pending", "processing", "completed", "failed", "awaiting_approval"] }).notNull().default("pending"),
+  aiResponse: text("ai_response"),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  processedAt: integer("processed_at", { mode: "timestamp" }),
+}, (table) => ({
+  userIdIdx: index("message_queue_user_id_idx").on(table.userId),
+  statusIdx: index("message_queue_status_idx").on(table.status),
+}));
+
+export const approvalResponses = sqliteTable("approval_responses", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  userId: text("user_id").notNull(),
+  queueId: integer("queue_id").notNull().references(() => messageQueue.id),
+  draftResponse: text("draft_response").notNull(),
+  source: text("source", { enum: ["email", "teams"] }).notNull(),
+  recipientInfo: text("recipient_info").notNull(),
+  status: text("status", { enum: ["pending", "approved", "rejected"] }).notNull().default("pending"),
+  createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
+  decidedAt: integer("decided_at", { mode: "timestamp" }),
+}, (table) => ({
+  userIdIdx: index("approval_responses_user_id_idx").on(table.userId),
+  queueIdIdx: index("approval_responses_queue_id_idx").on(table.queueId),
+}));
