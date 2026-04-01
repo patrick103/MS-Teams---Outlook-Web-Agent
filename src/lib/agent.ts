@@ -53,7 +53,7 @@ async function getUserConfig(userId: string) {
   return { apiKey, model: config.openrouterModel ?? "anthropic/claude-sonnet-4" };
 }
 
-async function logAction(
+export async function logAction(
   userId: string,
   action: string,
   source: string,

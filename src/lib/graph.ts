@@ -25,6 +25,14 @@ export async function getEmails(accessToken: string, top = 25, folder = "inbox")
   return response.value;
 }
 
+export async function getEmailById(accessToken: string, messageId: string) {
+  const client = createGraphClient(accessToken);
+  return await client
+    .api(`/me/messages/${messageId}`)
+    .select("id,subject,bodyPreview,body,from,toRecipients,receivedDateTime,isRead,importance")
+    .get();
+}
+
 export async function sendEmail(
   accessToken: string,
   to: string[],

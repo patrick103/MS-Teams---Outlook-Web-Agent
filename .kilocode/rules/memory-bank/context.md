@@ -1,10 +1,10 @@
-# Active Context: Next.js Starter Template
+# Active Context: MS Teams & Outlook AI Agent
 
 ## Current State
 
-**Template Status**: ✅ Ready for development
+**Status**: Building autonomous monitoring features
 
-The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. It's ready for AI-assisted expansion to build any type of application.
+The application is a Next.js app that integrates with Microsoft Graph API to monitor Outlook emails and Teams messages, with AI-powered auto-reply capabilities.
 
 ## Recently Completed
 
@@ -14,7 +14,25 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] ESLint configuration
 - [x] Memory bank documentation
 - [x] Recipe system for common features
-- [x] Added comprehensive README.md with setup instructions, project structure, API routes, and Azure AD configuration guide
+- [x] Added comprehensive README.md with setup instructions
+- [x] Microsoft Graph API integration (emails, teams, calendar)
+- [x] AI agent with OpenRouter (email reply, teams reply, summaries)
+- [x] Settings page with auto-reply/auto-summary toggles
+- [x] Database schema with Drizzle ORM (sessions, settings, agentLogs, notes, graphSubscriptions, messageQueue, approvalResponses)
+- [x] **Webhook endpoint for Graph change notifications** (`src/app/api/webhooks/graph/route.ts`)
+  - GET handler for subscription validation (returns validationToken plain text)
+  - POST handler: parses notifications, queues created items into message_queue
+  - Determines email vs Teams by resource path pattern matching
+  - Returns 202 Accepted immediately for async processing
+- [x] **Notification processor endpoint** (`src/app/api/webhooks/process/route.ts`)
+  - Picks up pending items from message_queue
+  - Fetches full message content via Graph API (getEmailById, getChatMessages)
+  - Generates AI responses using existing agent functions
+  - Auto-sends if agentAutoReply enabled, creates approval_responses entry if disabled
+  - Logs all actions via logAction()
+- [x] **Added getEmailById to graph.ts** for fetching individual email messages
+- [x] **Exported logAction from agent.ts** (was previously internal)
+- [x] **Added getTokenForUserId to auth-helpers.ts** for background token retrieval by userId
 
 ## Current Structure
 
@@ -87,3 +105,4 @@ export async function GET() {
 |------|---------|
 | Initial | Template created with base setup |
 | 2026-03-25 | Added README.md with full project documentation |
+| 2026-04-01 | Created webhook endpoint for Graph change notifications and notification processor |
