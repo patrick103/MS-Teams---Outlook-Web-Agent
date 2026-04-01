@@ -8,6 +8,7 @@ const envSchema = z.object({
   NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
   OPENROUTER_API_KEY: z.string().optional(),
   TOKEN_ENCRYPTION_KEY: z.string().min(32).optional(),
+  CRON_SECRET: z.string().optional(),
 });
 
 const parsed = envSchema.safeParse(process.env);
