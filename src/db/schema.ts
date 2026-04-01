@@ -1,4 +1,4 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
 
 export const sessions = sqliteTable("sessions", {
   id: text("id").primaryKey(),
@@ -29,7 +29,9 @@ export const agentLogs = sqliteTable("agent_logs", {
   input: text("input"),
   output: text("output"),
   createdAt: integer("created_at", { mode: "timestamp" }).$defaultFn(() => new Date()),
-});
+}, (table) => ({
+  userIdIdx: index("agent_logs_user_id_idx").on(table.userId),
+}));
 
 export const notes = sqliteTable("notes", {
   id: integer("id").primaryKey({ autoIncrement: true }),

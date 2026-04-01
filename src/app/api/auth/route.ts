@@ -25,13 +25,6 @@ export async function GET(request: NextRequest) {
         maxAge: 60 * 60 * 24,
         path: "/",
       });
-      response.cookies.set("user_id", session.userId, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24,
-        path: "/",
-      });
       response.cookies.delete("pkce_verifier");
       return response;
     } catch (error) {
@@ -69,6 +62,5 @@ export async function DELETE(request: NextRequest) {
   }
   const response = NextResponse.json({ success: true });
   response.cookies.delete("session_id");
-  response.cookies.delete("user_id");
   return response;
 }

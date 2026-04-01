@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
   }
 
   const { searchParams } = new URL(request.url);
-  const top = parseInt(searchParams.get("top") ?? "25");
+  const top = Math.min(Math.max(parseInt(searchParams.get("top") ?? "25", 10) || 25, 1), 100);
   const folder = searchParams.get("folder") ?? "inbox";
 
   try {
