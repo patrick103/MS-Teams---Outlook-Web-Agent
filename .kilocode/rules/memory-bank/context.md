@@ -15,6 +15,7 @@ The template is a clean Next.js 16 starter with TypeScript and Tailwind CSS 4. I
 - [x] Memory bank documentation
 - [x] Recipe system for common features
 - [x] Added comprehensive README.md with setup instructions, project structure, API routes, and Azure AD configuration guide
+- [x] Created src/lib/subscriptions.ts — Graph subscription manager for email and Teams webhooks (createMailSubscription, createTeamsSubscription, renewSubscription, deleteSubscription, initializeSubscriptions, renewAllSubscriptions)
 
 ## Current Structure
 
@@ -87,3 +88,4 @@ export async function GET() {
 |------|---------|
 | Initial | Template created with base setup |
 | 2026-03-25 | Added README.md with full project documentation |
+| 2026-04-01 | Created src/lib/subscriptions.ts with 6 Graph subscription management functions |
